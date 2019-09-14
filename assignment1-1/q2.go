@@ -3,6 +3,7 @@ package cos418_hw1_1
 import (
 	"bufio"
 	"io"
+	"os"
 	"strconv"
 )
 
@@ -10,8 +11,28 @@ import (
 // You should only output to `out` once.
 // Do NOT modify function signature.
 func sumWorker(nums chan int, out chan int) {
-	// TODO: implement me
-	// HINT: use for loop over `nums`
+	var result int
+	for v := range nums {
+		result += v
+	}
+	out <- result
+}
+
+// Asynchronous function to read the numbers
+func numberReader(out chan int, nums []int) {
+	for _, v := range nums {
+		out <- v
+	}
+	close(out)
+}
+
+func getResults(resultChannel chan int, num int) int {
+	var result = 0
+	for i := 0; i < num; i++ {
+		value := <-resultChannel
+		result += value
+	}
+	return result
 }
 
 // Read integers from the file `fileName` and return sum of all values.
@@ -20,10 +41,18 @@ func sumWorker(nums chan int, out chan int) {
 // You should use `checkError` to handle potential errors.
 // Do NOT modify function signature.
 func sum(num int, fileName string) int {
-	// TODO: implement me
-	// HINT: use `readInts` and `sumWorkers`
-	// HINT: used buffered channels for splitting numbers between workers
-	return 0
+	dat, _ := os.Open(fileName)
+	r := bufio.NewReader(dat)
+	var nums, _ = readInts(r)
+	var capacity = len(nums) / num
+	inChannel := make(chan int)
+	outChannel := make(chan int, capacity)
+	for i := 0; i < num; i++ {
+		go sumWorker(inChannel, outChannel)
+	}
+	go numberReader(inChannel, nums)
+	var result = getResults(outChannel, num)
+	return result
 }
 
 // Read a list of integers separated by whitespace from `r`.

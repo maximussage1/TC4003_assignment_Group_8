@@ -1,7 +1,6 @@
 package cos418_hw1_1
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
@@ -68,10 +67,6 @@ func readStringFromFile(path string) []string {
 type WordCount struct {
 	Word  string
 	Count int
-}
-
-func (wc WordCount) String() string {
-	return fmt.Sprintf("%v: %v", wc.Word, wc.Count)
 }
 
 // Helper function to sort a list of word counts in place.
