@@ -41,9 +41,11 @@ func getResults(resultChannel chan int, num int) int {
 // You should use `checkError` to handle potential errors.
 // Do NOT modify function signature.
 func sum(num int, fileName string) int {
-	dat, _ := os.Open(fileName)
+	dat, err1 := os.Open(fileName)
+	checkError(err1)
 	r := bufio.NewReader(dat)
-	var nums, _ = readInts(r)
+	var nums, err2 = readInts(r)
+	checkError(err2)
 	var capacity = len(nums) / num
 	inChannel := make(chan int)
 	outChannel := make(chan int, capacity)
